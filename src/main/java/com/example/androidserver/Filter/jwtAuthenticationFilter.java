@@ -26,11 +26,13 @@ public class jwtAuthenticationFilter extends OncePerRequestFilter {
         if (receiveToken == null || !receiveToken.startsWith("Bearer ")) {
             System.out.println("filterChain.doFilter(request, response) 직전");
             filterChain.doFilter(request, response);
+            System.out.println("filterChain.doFilter(request, response) 직후");
             return;
         }
         // Authentication 객체 얻어와서
         Authentication authentication;
         try {
+            System.out.println("try 시작");
             authentication = getAuthentication(request, response, filterChain);
             // SecurityContextHolder 에 등록
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -47,6 +49,11 @@ public class jwtAuthenticationFilter extends OncePerRequestFilter {
     }
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return request.getServletPath().equals("/login");
+        if(request.getServletPath().equals("/user/login")) {
+            return true;
+        } else if(request.getServletPath().equals("/user/register")) {
+            return true;
+        }
+        return false;
     }
 }
