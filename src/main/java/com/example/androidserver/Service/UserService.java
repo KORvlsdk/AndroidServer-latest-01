@@ -1,10 +1,13 @@
 package com.example.androidserver.Service;
 
 import com.example.androidserver.Dto.ResultDto;
+import com.example.androidserver.Dto.UserDto;
 import com.example.androidserver.Entity.UserEntity;
 import com.example.androidserver.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -41,14 +44,25 @@ public class UserService implements UserDetailsService {
     }
 
     public ResultDto loginUser(UserEntity userEntity) {
+        // 반환 객체
         ResultDto resultDto = new ResultDto();
+        // 조회 용도의 엔티티
         Optional<UserEntity> findUser = userRepository.findByEmail(userEntity.getEmail());
         UserEntity user = findUser.orElse(null);
+
+        // 유저가 존재하고, 패스워드가 같다면..
         if(user != null && passwordEncoder.matches(userEntity.getPassword(), user.getPassword())) {
+            System.out.println("로그인 성공");
+            // 토큰 생성
             resultDto.setToken("Bearer " + generateToken(user.getEmail()));
             resultDto.setResult(true);
             resultDto.setMessage("로그인 성공");
+            // resultDto 내부 UserDto 설정
+            resultDto.setUserDto(UserEntity.changeToDto(user));
+            resultDto.userDto.setPhoneNum(null);
+            resultDto.userDto.setPassword(null);
         } else {
+            System.out.println("로그인 실패");
             resultDto.setToken(null);
             resultDto.setResult(false);
             resultDto.setMessage("로그인 실패");

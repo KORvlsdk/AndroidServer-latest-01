@@ -22,20 +22,30 @@ public class UserController {
     private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/register")
-    public String registerUser(@RequestBody UserDto userForm) {
+    public ResultDto registerUser(@RequestBody UserDto userForm) {
+        ResultDto resultDto = new ResultDto();
         UserEntity user = UserEntity.createUser(userForm, passwordEncoder);
 
         if(userService.saveUser(user)) {
-            return "회원가입이 완료되었습니다.";
+            resultDto.setMessage("회원가입이 완료되었습니다.");
+        } else {
+            resultDto.setMessage("회원가입 실패..");
         }
 
-        return "회원가입 실패..";
+        return resultDto;
     }
     @PostMapping("/login")
     public ResultDto loginUser(@RequestBody UserDto userForm) {
+        System.out.println(userForm.getEmail());
+        System.out.println(userForm.getPassword());
         UserEntity user = UserDto.changeToEntity(userForm);
 
-        return userService.loginUser(user);
+        ResultDto resultDto = userService.loginUser(user);
+        System.out.println(resultDto.getToken());
+        System.out.println(resultDto.userDto.getEmail());
+        System.out.println(resultDto.getUserDto().getUsername());
+
+        return resultDto;
     }
 
     @PostMapping("/auth")
@@ -44,7 +54,7 @@ public class UserController {
         ResultDto resultDto = new ResultDto();
         resultDto.setResult(true);
         resultDto.setToken(authentication.getCredentials().toString());
-        resultDto.setMessage("로그인 성공!");
+        resultDto.setMessage("인증 페이지 요청 성공!");
         return resultDto;
     }
 }

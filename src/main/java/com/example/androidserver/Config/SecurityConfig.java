@@ -12,6 +12,7 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -53,6 +54,9 @@ public class SecurityConfig {
                         .requestMatchers("/user/login", "/user/register").permitAll()
                         .anyRequest().authenticated()
                 )
+                // 세션 설정 비활성화
+                .sessionManagement(ssetion -> ssetion
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new jwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
                 // 예외 설정, 문제) 로그인 하지 않고, 인증 필요한 페이지 접근하면 오류 코드 반환이 아니라,
                 // 로그인 페이지로 리다이렉션 됨. 이유는 아직 모르겠음.

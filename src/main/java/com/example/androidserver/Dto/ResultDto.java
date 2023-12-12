@@ -9,4 +9,5 @@ public class ResultDto {
     public String token;
     public Boolean result;
     public String message;
+    public UserDto userDto;
 }
